@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract zip
+        run: |
+          mkdir -p project
+          unzip -o CaneIslands-trimmed.zip -d project
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: project/pom.xml
+
+      - name: Build
+        run: mvn -B -f project/pom.xml package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CaneIslands
+          path: project/target/CaneIslands.jar
